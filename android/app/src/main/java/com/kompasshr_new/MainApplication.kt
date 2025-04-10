@@ -1,4 +1,4 @@
-package com.kompasshr_new
+package com.kompasshr
 
 import android.app.Application
 import com.facebook.react.PackageList
