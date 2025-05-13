@@ -31,7 +31,7 @@ const SnackbarComponent = () => {
       visible={visible}
       onDismiss={() => dispatch(hideSnackbar())}
       style={[styles.snackbar, getSnackbarStyle()]}
-      duration={1200}
+      duration={2000}
       theme={{
         ...DefaultTheme,
         colors: {

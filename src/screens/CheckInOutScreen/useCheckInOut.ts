@@ -11,7 +11,7 @@ import {isIos} from '../../components/helper/utility';
 import useLocationTracker from '../../components/helper/Location';
 import useLocationDetection from '../../components/helper/Location/useLocationDetection';
 import {useLazyGetLocationNamesQuery} from '../../redux/services/Location/LocationApiSlice';
-
+import NetInfo, {fetch} from '@react-native-community/netinfo';
 interface CheckInOutDetails {
   CheckInOutLatitude: number | null;
   CheckInOutLongitude: number | null;
@@ -37,7 +37,7 @@ const useCheckInOut = () => {
 
   const navigation = useNavigation();
 
-  const [markAttendance, markAttendanceResult] = useMarkAttendanceMutation();
+  const [markAttendance, Result] = useMarkAttendanceMutation();
   const {getCurrentPosition, location , hasError} = useLocationTracker();
 
   const [isFetching , setIsFetching] = useState(true);
@@ -251,8 +251,12 @@ const useCheckInOut = () => {
     try {
       const payload = await generateCheckInOutPayload();
       console.log('Generated payload:', payload);
-      const response = await markAttendance(payload).unwrap();
-      console.log('API response:', response);
+      const netInfo = await fetch();
+      if (netInfo.isConnected) {
+        const response = await markAttendance(payload).unwrap();
+        console.log('API response:', response);
+
+      }
       // Handle success (e.g., show a success message)
     } catch (error) {
       console.error('Error submitting attendance:', error);

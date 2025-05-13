@@ -29,9 +29,12 @@ type FormField = 'customerCode' | 'loginId' | 'password';
 
 const LoginScreen = () => {
   const [formData, setFormData] = useState({
-    customerCode: 'K1005',
-    loginId: '200038',
-    password: 'SM@2024',
+    // customerCode: 'K1005',
+    // loginId: '200038',
+    // password: 'SM@2024',
+    customerCode: '',
+    loginId: '',
+    password: '',
   });
   const [errors, setErrors] = useState({
     customerCode: '',
@@ -331,6 +334,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: width * 0.035,
     color: Colors.lightGrey,
+    marginBottom:10
   },
 });
 

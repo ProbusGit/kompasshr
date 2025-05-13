@@ -22,25 +22,58 @@ const {width, height} = Dimensions.get('window');
 
 const HomeScreen = ({navigation}: any) => {
   const {status} = useAppSelector(state => state.status);
-
+  const [totalHours,setTotalHours] = useState('N/A')
   const {history, isLoading} = useAttendanceHistory();
   const [checkInTime, setCheckInTime] = useState('N/A');
   const [checkOutTime, setCheckOutTime] = useState('N/A');
- 
-
   const {user} = useAppSelector(state => state.auth);
-  console.log('user after login', user);
+
+  console.log('user after login',checkOutTime);
 
   useEffect(() => {
-    if ( history && history.length > 0) {
+    if (history && history.length > 0) {
       const firstEntry = history[0];
       const lastEntry = history[history.length - 1];
-
       setCheckOutTime(firstEntry ? extractTime(firstEntry.CheckInOutDateTime) : 'N/A');
       setCheckInTime(lastEntry ? extractTime(lastEntry.CheckInOutDateTime) : 'N/A');
     }
-  }, [history]);
-
+  }, [history,checkOutTime]);
+  
+  useEffect(() => {
+    if (history && history.length > 1) {
+      const employeeData = history
+        .filter(item => item.CheckInOutEmployeeId === user.employeeId)
+        .sort((a, b) => new Date(a.CheckInOutDateTime) - new Date(b.CheckInOutDateTime));
+  
+      if (employeeData.length === 0) return;
+  
+      setCheckInTime(extractTime(employeeData[0].CheckInOutDateTime));
+      setCheckOutTime(extractTime(employeeData[employeeData.length - 1].CheckInOutDateTime));
+  
+      let totalMs = 0;
+      let inTime: Date | null = null;
+  
+      employeeData.forEach(record => {
+        const time = new Date(record.CheckInOutDateTime);
+        if (record.CheckInOutDirection.toLowerCase() === 'in') {
+          inTime = time;
+        } else if (record.CheckInOutDirection.toLowerCase() === 'out' && inTime) {
+          totalMs += time.getTime() - inTime.getTime();
+          inTime = null;
+        }
+      });
+  
+      const hours = Math.floor(totalMs / (1000 * 60 * 60));
+      const minutes = Math.floor((totalMs % (1000 * 60 * 60)) / (1000 * 60));
+      const formatted = `${hours.toString().padStart(2, '0')}:${minutes
+        .toString()
+        .padStart(2, '0')}`;
+        console.log('Total Hours:', formatted);
+      setTotalHours(formatted);
+    }
+  }, [history,checkOutTime]);
+  
+  
 
  
   return (
@@ -99,7 +132,7 @@ const HomeScreen = ({navigation}: any) => {
               </View>
               <View style={styles.punchItem}>
                 <Icon name="timer" size={24} color="#ff0000" />
-                <Text style={styles.punchText}>00:00</Text>
+                <Text style={styles.punchText}>{totalHours ? totalHours : "00:00"}</Text>
                 <Text style={styles.punchLabel}>Total Hours</Text>
               </View>
             </View>
